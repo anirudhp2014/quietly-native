@@ -8,7 +8,7 @@ jest.mock('expo/config', () => {
 }, { virtual: true });
 
 // Mock the winter/installGlobal module that's causing issues
-jest.doMock('expo/src/winter/installGlobal', () => {
+jest.mock('expo/src/winter/installGlobal', () => {
   return {};
 }, { virtual: true });
 
