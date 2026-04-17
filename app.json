@@ -53,7 +53,8 @@
         {
           "photosPermission": "Allow Quietly to access your photos to set your profile picture."
         }
-      ]
+      ],
+      "./modules/mood-activity/plugin"
     ],
     "experiments": {
       "typedRoutes": true

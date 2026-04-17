@@ -1,0 +1,13 @@
+import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+export function LoadingScreen() {
+  return (
+    <SafeAreaView className="flex-1 bg-background">
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" color="#1e293b" />
+      </View>
+    </SafeAreaView>
+  );
+}

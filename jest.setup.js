@@ -1,27 +1,37 @@
-// Prevent Expo from loading native modules
-jest.mock('expo', () => {
-  return {};
-}, { virtual: true });
-
-jest.mock('expo/config', () => {
-  return {};
-}, { virtual: true });
-
-// Mock the winter/installGlobal module that's causing issues
-jest.mock('expo/src/winter/installGlobal', () => {
-  return {};
-}, { virtual: true });
-
-jest.mock('@react-native-async-storage/async-storage', () => {
-  return {
-    __esModule: true,
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-    removeItem: jest.fn(),
-    clear: jest.fn(),
-  };
-});
-
-// Set up environment variables for testing
+// Environment variables for testing
 process.env.EXPO_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY = 'test-key-123456789';
+
+// Expo's winter runtime (expo/src/winter/runtime.native.ts) installs lazy
+// property getters on `global` for TextDecoder, URL, structuredClone, etc.
+// These lazy getters call require() when first accessed. If accessed after
+// isInsideTestCode===false (e.g. during renderHook teardown), jest-runtime
+// throws "outside scope". We replace each lazy getter with a resolved value
+// so the require() chain never fires during teardown.
+const winterGlobals = [
+  ['__ExpoImportMetaRegistry', { url: null }],
+  ['structuredClone', global.structuredClone ?? ((v) => JSON.parse(JSON.stringify(v)))],
+];
+for (const [name, value] of winterGlobals) {
+  try {
+    Object.defineProperty(global, name, {
+      value,
+      configurable: true,
+      writable: true,
+      enumerable: false,
+    });
+  } catch (_) {
+    // Property may be non-configurable in some environments; skip it
+  }
+}
+
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  getItem: jest.fn().mockResolvedValue(null),
+  setItem: jest.fn().mockResolvedValue(null),
+  removeItem: jest.fn().mockResolvedValue(null),
+  clear: jest.fn().mockResolvedValue(null),
+  multiGet: jest.fn().mockResolvedValue([]),
+  multiSet: jest.fn().mockResolvedValue(null),
+  getAllKeys: jest.fn().mockResolvedValue([]),
+}));

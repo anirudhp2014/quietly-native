@@ -1,0 +1,14 @@
+{
+  "name": "mood-activity",
+  "version": "1.0.0",
+  "description": "Expo module for Android foreground service mood notification and iOS Live Activities",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "expo-module build"
+  },
+  "peerDependencies": {
+    "expo": "*",
+    "react-native": "*"
+  }
+}
